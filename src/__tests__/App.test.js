@@ -1,6 +1,6 @@
 // src/App.test.js
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import App from "./App";
+import App from "../App";
 import '@testing-library/jest-dom';
 
 beforeEach(() => {
@@ -92,11 +92,11 @@ test("deletes the question when the delete button is clicked", async () => {
     expect(screen.getByText("Sample Question?")).toBeInTheDocument();
   });
 
-  // Find and click the delete button
+  
   const deleteButton = screen.getByText("Delete");
   fireEvent.click(deleteButton);
 
-  // Assert that DELETE request was sent
+  
   await waitFor(() => {
     expect(fetch).toHaveBeenCalledWith(
       "http://localhost:4000/questions/1",
@@ -106,7 +106,7 @@ test("deletes the question when the delete button is clicked", async () => {
     );
   });
 
-  // Assert that the question has been removed from the DOM
+  
   await waitFor(() => {
     expect(screen.queryByText("Sample Question?")).not.toBeInTheDocument();
   });
