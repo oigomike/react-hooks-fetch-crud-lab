@@ -15,13 +15,10 @@ export const handlers = [
     return res(ctx.status(200), ctx.json(questions));
   }),
 
-  // POST new question
+  // POST a new question
   rest.post("http://localhost:4000/questions", async (req, res, ctx) => {
     const body = await req.json();
-    const newQuestion = {
-      id: questions.length + 1,
-      ...body
-    };
+    const newQuestion = { id: Date.now(), ...body };
     questions.push(newQuestion);
     return res(ctx.status(201), ctx.json(newQuestion));
   }),
@@ -29,15 +26,15 @@ export const handlers = [
   // DELETE question by ID
   rest.delete("http://localhost:4000/questions/:id", (req, res, ctx) => {
     const id = parseInt(req.params.id);
-    questions = questions.filter(q => q.id !== id);
+    questions = questions.filter((q) => q.id !== id);
     return res(ctx.status(200), ctx.json({}));
   }),
 
-  // PATCH correctIndex of question
+  // PATCH correctIndex of a question
   rest.patch("http://localhost:4000/questions/:id", async (req, res, ctx) => {
     const id = parseInt(req.params.id);
     const body = await req.json();
-    const question = questions.find(q => q.id === id);
+    const question = questions.find((q) => q.id === id);
     if (question) {
       question.correctIndex = body.correctIndex;
       return res(ctx.status(200), ctx.json(question));
@@ -46,4 +43,5 @@ export const handlers = [
     }
   })
 ];
+
 
