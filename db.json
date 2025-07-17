@@ -1,7 +1,7 @@
 {
   "questions": [
     {
-      "id": 1,
+      "id": "1",
       "prompt": "lorem testum 1",
       "answers": [
         "a",
@@ -12,7 +12,7 @@
       "correctIndex": 2
     },
     {
-      "id": 2,
+      "id": "2",
       "prompt": "lorem testum 2",
       "answers": [
         "true",
@@ -21,7 +21,7 @@
       "correctIndex": 0
     },
     {
-      "id": 3,
+      "id": "3",
       "prompt": "What special prop should always be included for lists of elements?",
       "answers": [
         "id",
@@ -32,7 +32,7 @@
       "correctIndex": 2
     },
     {
-      "id": 4,
+      "id": "4",
       "prompt": "A React component is a function that returns ______.",
       "answers": [
         "HTML",
@@ -43,7 +43,7 @@
       "correctIndex": 1
     },
     {
-      "id": 5,
+      "id": "5",
       "prompt": "Which event handler will run when a user is finished filling out a form?",
       "answers": [
         "onSubmit",
@@ -54,7 +54,7 @@
       "correctIndex": 0
     },
     {
-      "id": 6,
+      "id": "6",
       "prompt": "______ is a tool that transpiles JSX into valid JavaScript.",
       "answers": [
         "React",
@@ -65,7 +65,7 @@
       "correctIndex": 1
     },
     {
-      "id": 7,
+      "id": "7",
       "prompt": "What syntax makes it possible to unpack values from arrays, or properties from objects, into distinct variables?",
       "answers": [
         "spread",
@@ -76,7 +76,7 @@
       "correctIndex": 3
     },
     {
-      "id": 8,
+      "id": "8",
       "prompt": "Returning different elements from a component depending on the state of your application is known as _____ rendering.",
       "answers": [
         "voodoo",
@@ -87,6 +87,7 @@
       "correctIndex": 1
     },
     {
+      "id": "876e",
       "prompt": "Test Prompt",
       "answers": [
         "A",
@@ -94,10 +95,10 @@
         "C",
         "D"
       ],
-      "correctIndex": 2,
-      "id": 9
+      "correctIndex": 2
     },
     {
+      "id": "03bd",
       "prompt": "Test Prompt",
       "answers": [
         "A",
@@ -105,10 +106,10 @@
         "C",
         "D"
       ],
-      "correctIndex": 2,
-      "id": 10
+      "correctIndex": 2
     },
     {
+      "id": "b9cc",
       "prompt": "Test Prompt",
       "answers": [
         "A",
@@ -116,10 +117,10 @@
         "C",
         "D"
       ],
-      "correctIndex": 2,
-      "id": 11
+      "correctIndex": 2
     },
     {
+      "id": "2522",
       "prompt": "Test Prompt",
       "answers": [
         "A",
@@ -127,41 +128,7 @@
         "C",
         "D"
       ],
-      "correctIndex": 2,
-      "id": 12
-    },
-    {
-      "prompt": "Test Prompt",
-      "answers": [
-        "A",
-        "B",
-        "C",
-        "D"
-      ],
-      "correctIndex": 2,
-      "id": 13
-    },
-    {
-      "prompt": "Test Prompt",
-      "answers": [
-        "A",
-        "B",
-        "C",
-        "D"
-      ],
-      "correctIndex": 2,
-      "id": 14
-    },
-    {
-      "prompt": "Test Prompt",
-      "answers": [
-        "A",
-        "B",
-        "C",
-        "D"
-      ],
-      "correctIndex": 2,
-      "id": 15
+      "correctIndex": 2
     }
   ]
 }

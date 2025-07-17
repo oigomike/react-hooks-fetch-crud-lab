@@ -1,34 +1,49 @@
 import { rest } from "msw";
-import { data } from "./data";
 
-let questions = data;
+let questions = [
+  {
+    id: 1,
+    prompt: "What is React?",
+    answers: ["Library", "Language", "Framework", "Compiler"],
+    correctIndex: 0
+  }
+];
 
 export const handlers = [
+  // GET all questions
   rest.get("http://localhost:4000/questions", (req, res, ctx) => {
-    return res(ctx.json(questions));
+    return res(ctx.status(200), ctx.json(questions));
   }),
-  rest.post("http://localhost:4000/questions", (req, res, ctx) => {
-    const id = questions[questions.length - 1]?.id + 1 || 1;
-    const question = { id, ...req.body };
-    questions.push(question);
-    return res(ctx.json(question));
+
+  // POST new question
+  rest.post("http://localhost:4000/questions", async (req, res, ctx) => {
+    const body = await req.json();
+    const newQuestion = {
+      id: questions.length + 1,
+      ...body
+    };
+    questions.push(newQuestion);
+    return res(ctx.status(201), ctx.json(newQuestion));
   }),
+
+  // DELETE question by ID
   rest.delete("http://localhost:4000/questions/:id", (req, res, ctx) => {
-    const { id } = req.params;
-    if (isNaN(parseInt(id))) {
-      return res(ctx.status(404), ctx.json({ message: "Invalid ID" }));
-    }
-    questions = questions.filter((q) => q.id !== parseInt(id));
-    return res(ctx.json({}));
+    const id = parseInt(req.params.id);
+    questions = questions.filter(q => q.id !== id);
+    return res(ctx.status(200), ctx.json({}));
   }),
-  rest.patch("http://localhost:4000/questions/:id", (req, res, ctx) => {
-    const { id } = req.params;
-    const { correctIndex } = req.body;
-    const question = questions.find((q) => q.id === parseInt(id));
-    if (!question) {
-      return res(ctx.status(404), ctx.json({ message: "Invalid ID" }));
+
+  // PATCH correctIndex of question
+  rest.patch("http://localhost:4000/questions/:id", async (req, res, ctx) => {
+    const id = parseInt(req.params.id);
+    const body = await req.json();
+    const question = questions.find(q => q.id === id);
+    if (question) {
+      question.correctIndex = body.correctIndex;
+      return res(ctx.status(200), ctx.json(question));
+    } else {
+      return res(ctx.status(404), ctx.json({ message: "Not found" }));
     }
-    question.correctIndex = correctIndex;
-    return res(ctx.json(question));
-  }),
+  })
 ];
+
