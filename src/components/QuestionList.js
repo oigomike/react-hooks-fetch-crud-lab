@@ -6,13 +6,8 @@ function QuestionList({ questions, onDelete, onUpdate }) {
     <section>
       <h2>Questions</h2>
       <ul>
-        {questions.map(question => (
-          <QuestionItem
-            key={question.id}
-            question={question}
-            onDelete={onDelete}
-            onUpdate={onUpdate}
-          />
+        {questions.map((q) => (
+          <QuestionItem key={q.id} question={q} onDelete={onDelete} onUpdate={onUpdate} />
         ))}
       </ul>
     </section>
@@ -20,6 +15,7 @@ function QuestionList({ questions, onDelete, onUpdate }) {
 }
 
 export default QuestionList;
+
 
 
 

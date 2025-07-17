@@ -1,47 +1,30 @@
 import React, { useEffect, useState } from "react";
-import QuestionForm from "./components/QuestionForm";
 import QuestionList from "./components/QuestionList";
+import QuestionForm from "./components/QuestionForm";
 
 function App() {
   const [questions, setQuestions] = useState([]);
 
   useEffect(() => {
     fetch("http://localhost:4000/questions")
-      .then((res) => res.json())
-      .then(setQuestions)
-      .catch((err) => console.error("Failed to fetch questions:", err));
+      .then((r) => r.json())
+      .then((data) => setQuestions(data));
   }, []);
 
   function handleAddQuestion(newQuestion) {
-    fetch("http://localhost:4000/questions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newQuestion),
-    })
-      .then((res) => res.json())
-      .then((data) => setQuestions((prev) => [...prev, data]));
+    setQuestions([...questions, newQuestion]);
   }
 
-  function handleDeleteQuestion(id) {
-    fetch(`http://localhost:4000/questions/${id}`, {
-      method: "DELETE",
-    }).then(() => {
-      setQuestions((prev) => prev.filter((q) => q.id !== id));
-    });
+  function handleDeleteQuestion(deletedId) {
+    const updatedQuestions = questions.filter((q) => q.id !== deletedId);
+    setQuestions(updatedQuestions);
   }
 
-  function handleUpdateQuestion(id, correctIndex) {
-    fetch(`http://localhost:4000/questions/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ correctIndex }),
-    })
-      .then((res) => res.json())
-      .then((updatedQ) => {
-        setQuestions((prev) =>
-          prev.map((q) => (q.id === updatedQ.id ? updatedQ : q))
-        );
-      });
+  function handleUpdateCorrectAnswer(updatedQuestion) {
+    const updatedQuestions = questions.map((q) =>
+      q.id === updatedQuestion.id ? updatedQuestion : q
+    );
+    setQuestions(updatedQuestions);
   }
 
   return (
@@ -50,8 +33,8 @@ function App() {
       <QuestionForm onAddQuestion={handleAddQuestion} />
       <QuestionList
         questions={questions}
-        onDeleteQuestion={handleDeleteQuestion}
-        onUpdateQuestion={handleUpdateQuestion}
+        onDelete={handleDeleteQuestion}
+        onUpdate={handleUpdateCorrectAnswer}
       />
     </main>
   );
