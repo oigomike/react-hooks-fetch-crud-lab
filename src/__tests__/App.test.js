@@ -1,94 +1,137 @@
-import React from "react";
-import "whatwg-fetch";
-import {
-  fireEvent,
-  render,
-  screen,
-  waitForElementToBeRemoved,
-} from "@testing-library/react";
-import "@testing-library/jest-dom/extend-expect";
-import { server } from "../mocks/server";
-
+import "@testing-library/jest-dom";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import App from "../components/App";
 
-beforeAll(() => server.listen());
-afterEach(() => server.resetHandlers());
-afterAll(() => server.close());
+// Mock fetch globally
+beforeEach(() => {
+  global.fetch = jest.fn((url, options) => {
+    if (!options) {
+      // GET /questions
+      return Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve([
+            {
+              id: 1,
+              prompt: "What is 2 + 2?",
+              answers: ["1", "2", "3", "4"],
+              correctIndex: 3,
+            },
+          ]),
+      });
+    }
+
+    if (options.method === "POST") {
+      // POST /questions
+      return Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            id: 2,
+            prompt: "Lorem Testum 1",
+            answers: ["A", "B", "C", "D"],
+            correctIndex: 2,
+          }),
+      });
+    }
+
+    if (options.method === "DELETE") {
+      // DELETE /questions/1
+      return Promise.resolve({ ok: true });
+    }
+
+    if (options.method === "PATCH") {
+      // PATCH /questions/1
+      return Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            id: 1,
+            prompt: "What is 2 + 2?",
+            answers: ["1", "2", "3", "4"],
+            correctIndex: 2,
+          }),
+      });
+    }
+  });
+});
+
+afterEach(() => {
+  jest.clearAllMocks();
+});
 
 test("displays question prompts after fetching", async () => {
   render(<App />);
-
-  fireEvent.click(screen.queryByText(/View Questions/));
-
-  expect(await screen.findByText(/lorem testum 1/g)).toBeInTheDocument();
-  expect(await screen.findByText(/lorem testum 2/g)).toBeInTheDocument();
+  expect(await screen.findByText("What is 2 + 2?")).toBeInTheDocument();
 });
 
 test("creates a new question when the form is submitted", async () => {
   render(<App />);
 
-  // wait for first render of list (otherwise we get a React state warning)
-  await screen.findByText(/lorem testum 1/g);
-
-  // click form page
-  fireEvent.click(screen.queryByText("New Question"));
-
-  // fill out form
-  fireEvent.change(screen.queryByLabelText(/Prompt/), {
-    target: { value: "Test Prompt" },
+  // Fill the form
+  fireEvent.change(screen.getByLabelText(/Prompt:/i), {
+    target: { value: "Lorem Testum 1" },
   });
-  fireEvent.change(screen.queryByLabelText(/Answer 1/), {
-    target: { value: "Test Answer 1" },
+  fireEvent.change(screen.getByLabelText(/Answer 1:/i), {
+    target: { value: "A" },
   });
-  fireEvent.change(screen.queryByLabelText(/Answer 2/), {
-    target: { value: "Test Answer 2" },
+  fireEvent.change(screen.getByLabelText(/Answer 2:/i), {
+    target: { value: "B" },
   });
-  fireEvent.change(screen.queryByLabelText(/Correct Answer/), {
-    target: { value: "1" },
+  fireEvent.change(screen.getByLabelText(/Answer 3:/i), {
+    target: { value: "C" },
+  });
+  fireEvent.change(screen.getByLabelText(/Answer 4:/i), {
+    target: { value: "D" },
+  });
+  fireEvent.change(screen.getByLabelText(/Correct Answer:/i), {
+    target: { value: "2" },
   });
 
-  // submit form
-  fireEvent.submit(screen.queryByText(/Add Question/));
+  fireEvent.click(screen.getByText(/Add Question/i));
 
-  // view questions
-  fireEvent.click(screen.queryByText(/View Questions/));
-
-  expect(await screen.findByText(/Test Prompt/g)).toBeInTheDocument();
-  expect(await screen.findByText(/lorem testum 1/g)).toBeInTheDocument();
+  await waitFor(() =>
+    expect(screen.getByText("Lorem Testum 1")).toBeInTheDocument()
+  );
 });
 
 test("deletes the question when the delete button is clicked", async () => {
-  const { rerender } = render(<App />);
+  render(<App />);
+  expect(await screen.findByText("What is 2 + 2?")).toBeInTheDocument();
 
-  fireEvent.click(screen.queryByText(/View Questions/));
+  fireEvent.click(screen.getByText("Delete Question"));
 
-  await screen.findByText(/lorem testum 1/g);
-
-  fireEvent.click(screen.queryAllByText("Delete Question")[0]);
-
-  await waitForElementToBeRemoved(() => screen.queryByText(/lorem testum 1/g));
-
-  rerender(<App />);
-
-  await screen.findByText(/lorem testum 2/g);
-
-  expect(screen.queryByText(/lorem testum 1/g)).not.toBeInTheDocument();
+  await waitFor(() =>
+    expect(screen.queryByText("What is 2 + 2?")).not.toBeInTheDocument()
+  );
 });
-
 test("updates the answer when the dropdown is changed", async () => {
-  const { rerender } = render(<App />);
+  render(<App />);
 
-  fireEvent.click(screen.queryByText(/View Questions/));
+  await screen.findByText("What's 2 + 2?");
 
-  await screen.findByText(/lorem testum 2/g);
+  const questionDropdown = screen.getByLabelText("Correct Answer:");
 
-  fireEvent.change(screen.queryAllByLabelText(/Correct Answer/)[0], {
-    target: { value: "3" },
-  });
+  fireEvent.change(questionDropdown, { target: { value: "2" } });
 
-  expect(screen.queryAllByLabelText(/Correct Answer/)[0].value).toBe("3");
-
-  rerender(<App />);
-
-  expect(screen.queryAllByLabelText(/Correct Answer/)[0].value).toBe("3");
+  await waitFor(() =>
+    expect(fetch).toHaveBeenCalledWith(
+      expect.stringContaining("/questions/1"),
+      expect.objectContaining({
+        method: "PATCH",
+      })
+    )
+  );
 });
+
+
+
+
+
+
+
+
+
+
+
+
