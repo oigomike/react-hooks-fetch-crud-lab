@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import App from "../components/App";
 
 // Mock fetch globally
@@ -22,7 +22,6 @@ beforeEach(() => {
     }
 
     if (options.method === "POST") {
-      // POST /questions
       return Promise.resolve({
         ok: true,
         json: () =>
@@ -36,12 +35,10 @@ beforeEach(() => {
     }
 
     if (options.method === "DELETE") {
-      // DELETE /questions/1
       return Promise.resolve({ ok: true });
     }
 
     if (options.method === "PATCH") {
-      // PATCH /questions/1
       return Promise.resolve({
         ok: true,
         json: () =>
@@ -68,7 +65,6 @@ test("displays question prompts after fetching", async () => {
 test("creates a new question when the form is submitted", async () => {
   render(<App />);
 
-  // Fill the form
   fireEvent.change(screen.getByLabelText(/Prompt:/i), {
     target: { value: "Lorem Testum 1" },
   });
@@ -105,12 +101,16 @@ test("deletes the question when the delete button is clicked", async () => {
     expect(screen.queryByText("What is 2 + 2?")).not.toBeInTheDocument()
   );
 });
+
 test("updates the answer when the dropdown is changed", async () => {
   render(<App />);
 
-  await screen.findByText("What's 2 + 2?");
+  // Make sure the question is loaded
+  const questionText = await screen.findByText("What is 2 + 2?");
+  const questionItem = questionText.closest("li");
 
-  const questionDropdown = screen.getByLabelText("Correct Answer:");
+  // Get the select inside that question's <li>
+  const questionDropdown = within(questionItem).getByLabelText("Correct Answer:");
 
   fireEvent.change(questionDropdown, { target: { value: "2" } });
 
@@ -119,10 +119,12 @@ test("updates the answer when the dropdown is changed", async () => {
       expect.stringContaining("/questions/1"),
       expect.objectContaining({
         method: "PATCH",
+        body: JSON.stringify({ correctIndex: 2 }),
       })
     )
   );
 });
+
 
 
 
